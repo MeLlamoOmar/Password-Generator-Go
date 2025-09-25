@@ -24,7 +24,7 @@ A simple command-line password generator and manager built with Go that allows u
 
 ```bash
 git clone https://github.com/MeLlamoOmar/Password-Generator-Go.git
-cd goWeb
+cd goPasswordGenerator
 ```
 
 2. Install dependencies:
@@ -50,7 +50,7 @@ go run main.go
 ## Project Structure
 
 ```
-goWeb/
+goPasswordGenerator/
 ├── main.go         # Main application entry point
 ├── util/
 │   └── util.go     # Utility functions for password generation
