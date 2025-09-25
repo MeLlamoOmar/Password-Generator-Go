@@ -1,7 +1,7 @@
 package util
 
 import (
-	"goWeb/model"
+	"goPasswordGenerator/model"
 	"math/rand"
 	"strings"
 	"text/template"

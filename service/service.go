@@ -1,8 +1,8 @@
 package service
 
 import (
-	"goWeb/model"
-	"goWeb/store"
+	"goPasswordGenerator/model"
+	"goPasswordGenerator/store"
 )
 
 type service struct {

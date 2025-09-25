@@ -1,4 +1,4 @@
-module goWeb
+module goPasswordGenerator
 
 go 1.24.4
 

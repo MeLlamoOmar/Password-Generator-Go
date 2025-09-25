@@ -2,7 +2,7 @@ package store
 
 import (
 	"database/sql"
-	"goWeb/model"
+	"goPasswordGenerator/model"
 )
 
 // import "database/sql"
