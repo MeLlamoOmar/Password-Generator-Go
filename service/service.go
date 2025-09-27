@@ -3,6 +3,7 @@ package service
 import (
 	"goPasswordGenerator/model"
 	"goPasswordGenerator/store"
+	"goPasswordGenerator/util"
 )
 
 type service struct {
@@ -22,6 +23,12 @@ func (s *service) GetPasswordById(id int) (*model.Password, error) {
 }
 
 func (s *service) CreatePassword(p *model.Password) (*model.Password, error) {
+	h, err := util.GenerateHashPassword(p.Password)
+	if err != nil {
+		return nil, err
+	}
+
+	p.Password = h
 	return s.store.Create(p)
 }
 

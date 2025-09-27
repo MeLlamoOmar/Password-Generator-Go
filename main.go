@@ -82,7 +82,7 @@ func main() {
 			includeNumbers := useNumbers == "y"
 			includeSymbols := useSymbols == "y"
 
-			generatedPass := util.GenerateRandomPassword(length, includeNumbers, includeSymbols)
+			generatedPass, _ := util.GenerateRandomPassword(length, includeNumbers, includeSymbols)
 
 			fmt.Print("What label do you want to use to save your password? ")
 			fmt.Scan(&label)
