@@ -1,11 +1,14 @@
 package util
 
 import (
+	"errors"
 	"goPasswordGenerator/model"
 	"math/rand"
 	"strings"
 	"text/template"
 	"time"
+
+	"golang.org/x/crypto/bcrypt"
 )
 
 // Caracteres posibles
@@ -23,7 +26,11 @@ const simbolos = "!@#$%^&*()-_=+[]{}<>?/"
 //
 // Returns:
 //   - A string representing the generated random password.
-func GenerateRandomPassword(length int, useNumbers bool, useSymbols bool) string {
+func GenerateRandomPassword(length int, useNumbers bool, useSymbols bool) (string, error) {
+	if length <= 0 {
+		return "", errors.New("the length must be greater than 0")
+	}
+
 	// Base set: letters
 	charset := letras                  // duplicate to include uppercase
 	charset += strings.ToUpper(letras) // add uppercase letters
@@ -43,7 +50,7 @@ func GenerateRandomPassword(length int, useNumbers bool, useSymbols bool) string
 		randomPassword[i] = charset[rand.Intn(len(charset))]
 	}
 
-	return string(randomPassword)
+	return string(randomPassword), nil
 }
 
 // PrintPasswordsTemplate renders a slice of Password objects using the provided template string.
@@ -74,4 +81,19 @@ func PrintPasswordsTemplate(passwords []*model.Password, tpl string) (string, er
 	}
 
 	return sb.String(), nil
+}
+
+func GenerateHashPassword(password string) (string, error) {
+	hp, err := bcrypt.GenerateFromPassword([]byte(password), 10)
+	if err != nil {
+		return "", err
+	}
+
+	return string(hp), nil
+}
+
+func CompareHashPassword(hashP, plainP string) bool {
+	err := bcrypt.CompareHashAndPassword([]byte(hashP), []byte(plainP))
+
+	return err == nil
 }
