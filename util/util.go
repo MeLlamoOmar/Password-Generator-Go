@@ -1,7 +1,11 @@
 package util
 
 import (
+	"crypto/aes"
+	"crypto/cipher"
+	"encoding/base64"
 	"errors"
+	"fmt"
 	"goPasswordGenerator/model"
 	"math/rand"
 	"strings"
@@ -96,4 +100,54 @@ func CompareHashPassword(hashP, plainP string) bool {
 	err := bcrypt.CompareHashAndPassword([]byte(hashP), []byte(plainP))
 
 	return err == nil
+}
+
+func Encrypt(s, key []byte) (string, error){
+	block, err := aes.NewCipher([]byte(key))
+	if err != nil {
+		fmt.Println(err.Error())
+		return "", err
+	}
+
+	aesGCM, err := cipher.NewGCM(block)
+	if err != nil {
+		fmt.Println("Error:", err.Error())
+		return "", err
+	}
+
+	nonce := make([]byte, aesGCM.NonceSize())
+
+	cipherText := aesGCM.Seal(nonce, nonce, []byte(s), nil)
+
+	return base64.StdEncoding.EncodeToString(cipherText), nil
+}
+
+func Decrypt(encodedString string, key []byte) (string, error) {
+	cipherText, err := base64.StdEncoding.DecodeString(encodedString)
+	if err != nil {
+		return "", err
+	}
+
+	block, err := aes.NewCipher(key)
+	if err != nil {
+		return "", nil
+	}
+
+	aesGCM, err := cipher.NewGCM(block)
+	if err != nil {
+		return "", nil
+	}
+
+	nonceSize := aesGCM.NonceSize()
+	if len(cipherText) < nonceSize {
+		return "", fmt.Errorf("cipherText demasiado corto")
+	}
+
+	nonce, cipherText := cipherText[:nonceSize], cipherText[nonceSize:]
+	plainText, err := aesGCM.Open(nil, nonce, cipherText, nil)
+	if err != nil {
+		return "", nil
+	}
+
+	return string(plainText), nil
 }
