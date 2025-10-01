@@ -1,9 +1,11 @@
 package service
 
 import (
+	"fmt"
 	"goPasswordGenerator/model"
 	"goPasswordGenerator/store"
 	"goPasswordGenerator/util"
+	"os"
 )
 
 type service struct {
@@ -15,20 +17,51 @@ func New(s store.Store) *service {
 }
 
 func (s *service) GetAllPasswords() ([]*model.Password, error) {
-	return s.store.GetAll()
+	key := os.Getenv("ENCRYPT_KEY")
+	if key == "" {
+		return nil, fmt.Errorf("the ENCRYPT_KEY doesnt exist on .env")
+	}
+
+	passwords, err := s.store.GetAll()
+	for _, password := range passwords {
+		password.Password, err = util.Decrypt(password.Password, []byte(key))
+		if err != nil {
+			return nil, err
+		}
+	}
+	return passwords, err
 }
 
 func (s *service) GetPasswordById(id int) (*model.Password, error) {
-	return s.store.GetById(id)
-}
+	key := os.Getenv("ENCRYPT_KEY")
+	if key == "" {
+		return nil, fmt.Errorf("the ENCRYPT_KEY doesnt exist on .env")
+	}
 
-func (s *service) CreatePassword(p *model.Password) (*model.Password, error) {
-	h, err := util.GenerateHashPassword(p.Password)
+	p, err := s.store.GetById(id)
 	if err != nil {
 		return nil, err
 	}
 
-	p.Password = h
+	p.Password, err = util.Decrypt(p.Password, []byte(key))
+	if err != nil {
+		return nil, err
+	}
+	
+	return p, nil
+}
+
+func (s *service) CreatePassword(p *model.Password) (*model.Password, error) {
+	key := os.Getenv("ENCRYPT_KEY")
+	if key == "" {
+		return nil, fmt.Errorf("the ENCRYPT_KEY doesnt exist on .env")
+	}
+	encryptPass, err := util.Encrypt([]byte(p.Password), []byte(key))
+	if err != nil {
+		return nil, err
+	}
+
+	p.Password = encryptPass
 	return s.store.Create(p)
 }
 
