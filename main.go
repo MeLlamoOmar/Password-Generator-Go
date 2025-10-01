@@ -13,6 +13,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/joho/godotenv"
 	_ "github.com/mattn/go-sqlite3"
 )
 
@@ -26,12 +27,16 @@ func clearScreen() {
 }
 
 func main() {
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
 	menu := `
 ==========================
    PASSWORD GENERATOR MENU
 ==========================
 1. Generate new password
-2. Save password to CSV
+2. Save password to DB
 3. View saved passwords
 4. View specific password
 5. Exit
